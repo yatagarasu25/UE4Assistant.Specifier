@@ -1,0 +1,14 @@
+{
+  "parameters": [
+    { "name": "Bitflags" },
+    { "name": "Experimental" },
+    { "name": "ScriptName" },
+    { "name": "ToolTip" }
+  ],
+  "meta": [
+    { "name": "Bitflags" },
+    { "name": "Experimental" },
+    { "name": "ScriptName" },
+    { "name": "ToolTip" }
+  ]
+}

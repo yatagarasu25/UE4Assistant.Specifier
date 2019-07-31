@@ -1,0 +1,11 @@
+{
+  "order": [
+    { "name": "Category", "order": "10" },
+    { "name": "BlueprintCallable", "order": "11" },
+    { "name": "BlueprintPure", "order": "11" },
+
+    { "name": "*", "order": "1024" },
+
+    { "name": "meta", "order": "-1" }
+  ]
+}

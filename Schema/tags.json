@@ -1,0 +1,10 @@
+[
+	{ "name": "uclass" },
+	{ "name": "ustruct" },
+	{ "name": "uinterface" },
+	{ "name": "uproperty" },
+	{ "name": "ufunction" },
+	{ "name": "uparam" },
+	{ "name": "uenum" },
+	{ "name": "umeta" }
+]

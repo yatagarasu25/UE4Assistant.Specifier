@@ -1,0 +1,10 @@
+[
+  { "order": 1, "name": "Blueprint" },
+  { "order": 2, "name": "Common" },
+  { "order": 3, "name": "Inspector" },
+  { "order": 4, "name": "Replication" },
+  { "order": 5, "name": "Configuration" },
+  { "order": 6, "name": "Multicast Delegate" },
+  { "order": 7, "name": "Property" },
+  { "order": 8, "name": "Array" }
+]

@@ -1,0 +1,6 @@
+{
+  "parameters": [
+    { "name": "ref" },
+    { "name": "DisplayName", "type": "string" }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "parameters": [
+    { "name": "BlueprintType" },
+    { "name": "DependsOn" },
+    { "name": "MinimalAPI" }
+  ],
+  "meta": [
+    { "name": "CannotImplementInterfaceInBlueprint" }
+  ]
+}

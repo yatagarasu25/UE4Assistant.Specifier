@@ -1,0 +1,7 @@
+{
+  "parameters": [
+    { "name": "DisplayName", "type": "string" },
+    { "name": "Hidden" },
+    { "name": "ToolTip", "type": "string" }
+  ]
+}

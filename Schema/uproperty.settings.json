@@ -1,0 +1,17 @@
+{
+  "order": [
+    { "name": "Category", "order": "10" },
+    { "name": "EditAnywhere", "order": "11" },
+    { "name": "EditDefaultsOnly", "order": "11" },
+    { "name": "EditInstanceOnly", "order": "11" },
+    { "name": "VisibleAnywhere", "order": "11" },
+    { "name": "VisibleDefaultsOnly", "order": "11" },
+    { "name": "VisibleInstanceOnly", "order": "11" },
+    { "name": "BlueprintReadOnly", "order": "12" },
+    { "name": "BlueprintReadWrite", "order": "12" },
+
+    { "name": "*", "order": "1024" },
+
+    { "name": "meta", "order": "-1" }
+  ]
+}

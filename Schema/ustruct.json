@@ -1,0 +1,15 @@
+{
+  "parameters": [
+    { "name": "Atomic" },
+    { "name": "BlueprintType" },
+    { "name": "Immutable" },
+    { "name": "NoExport" }
+  ],
+  "meta": [
+    { "name": "HasNativeBreak" },
+    { "name": "HasNativeMake" },
+    { "name": "HiddenByDefault" },
+    { "name": "ShortToolTip", "type": "string" },
+    { "name": "ToolTip", "type": "string" }
+  ]
+}
