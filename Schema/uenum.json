@@ -1,14 +1,13 @@
 {
   "parameters": [
-    { "name": "Bitflags" },
-    { "name": "Experimental" },
-    { "name": "ScriptName" },
-    { "name": "ToolTip" }
+    { "name": "BlueprintType" },
+    { "name": "Category", "type": "string" }
   ],
   "meta": [
     { "name": "Bitflags" },
+    { "name": "UseEnumValuesAsMaskValuesInEditor", "type": "bool" },
     { "name": "Experimental" },
-    { "name": "ScriptName" },
-    { "name": "ToolTip" }
+    { "name": "ToolTip", "type": "string" },
+    { "name": "ScriptName", "type": "string" }
   ]
 }

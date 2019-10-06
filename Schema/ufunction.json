@@ -30,7 +30,7 @@
   "meta": [
     { "name" : "None", "category": "ThreadSafety", "group": "ThreadSafety", "type" : "empty" },
     { "name" : "AdvancedDisplay", "type": "integer" },
-    { "name" : "ArrayParm" },
+    { "name" : "ArrayParm", "type": "integer" },
     { "name" : "ArrayTypeDependentParams" },
     { "name" : "AutoCreateRefTerm" },
     { "name" : "BlueprintAutocast" },

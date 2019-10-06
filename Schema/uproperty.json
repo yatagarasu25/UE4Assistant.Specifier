@@ -50,6 +50,8 @@
     { "name": "AssetBundles" },
     { "name": "BlueprintBaseOnly" },
     { "name": "BlueprintCompilerGeneratedDefaults" },
+    { "name": "Bitmask", "category": "Bitmask" },
+    { "name": "BitmaskEnum", "category": "Bitmask", "type": "string" },
     { "name": "ClampMin", "type": "number" },
     { "name": "ClampMax", "type": "number" },
     { "name": "ConfigHierarchyEditable" },
