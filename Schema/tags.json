@@ -1,10 +1,15 @@
 [
-	{ "name": "uclass" },
-	{ "name": "ustruct" },
-	{ "name": "uinterface" },
-	{ "name": "uproperty" },
-	{ "name": "ufunction" },
-	{ "name": "uparam" },
-	{ "name": "uenum" },
-	{ "name": "umeta" }
+	{ "name": "uclass", "type": "specifier" },
+	{ "name": "ustruct", "type": "specifier" },
+	{ "name": "uinterface", "type": "specifier" },
+	{ "name": "uproperty", "type": "specifier" },
+	{ "name": "ufunction", "type": "specifier" },
+	{ "name": "uparam", "type": "specifier" },
+	{ "name": "uenum", "type": "specifier" },
+	{ "name": "umeta", "type": "specifier" },
+	{ "name": "DECLARE_MULTICAST_DELEGATE*", "type": "delegate" },
+	{ "name": "DECLARE_DYNAMIC_DELEGATE*", "type": "delegate" },
+	{ "name": "DECLARE_DYNAMIC_MULTICAST_DELEGATE*", "type": "delegate" },
+	{ "name": "DECLARE_DYNAMIC_DELEGATE*", "type": "delegate" },
+	{ "name": "DECLARE_DYNAMIC_MULTICAST_DELEGATE*", "type": "delegate" }
 ]

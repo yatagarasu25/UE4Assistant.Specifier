@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using SystemEx;
 
@@ -64,6 +65,16 @@ namespace UE4Assistant.Specifier
 	public class TagModel
 	{
 		public string name;
+		public string type;
+
+		Lazy<Regex> nameRe;
+
+		public TagModel()
+		{
+			nameRe = new Lazy<Regex>(() => new Regex("^" + name.Replace("*", ".*?") + "$", RegexOptions.Compiled | RegexOptions.IgnoreCase));
+		}
+
+		public bool IsMatch(string str) => nameRe.Value.IsMatch(str);
 	}
 
 	public class SpecifierModel
