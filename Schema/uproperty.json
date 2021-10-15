@@ -43,12 +43,9 @@
     { "name": "VisibleInstanceOnly", "group": "InspectorVisibility" }
   ],
   "meta": [
-    { "name": "AllowAbstract" },
-    { "name": "AllowedClasses" },
     { "name": "AllowPreserveRatio" },
     { "name": "ArrayClamp" },
     { "name": "AssetBundles" },
-    { "name": "BlueprintBaseOnly" },
     { "name": "BlueprintCompilerGeneratedDefaults" },
     { "name": "Bitmask", "category": "Bitmask" },
     { "name": "BitmaskEnum", "category": "Bitmask", "type": "string" },
@@ -70,6 +67,16 @@
     { "name": "HideViewOptions" },
     { "name": "InlineEditConditionToggle" },
     { "name": "LongPackageName" },
-    { "name": "MakeEditWidget" }
+    { "name": "MakeEditWidget" },
+
+    { "name": "AllowAbstract", "group": "Class" },
+    { "name": "AllowedClasses", "group": "Class", "type": "string" },
+    { "name": "DisallowedClasses", "group": "Class", "type": "string" },
+    { "name": "OnlyPlaceable", "group": "Class" },
+    { "name": "BlueprintBaseOnly", "group": "Class" },
+    { "name": "MustImplement", "group": "Class", "type": "string" },
+    { "name": "HideViewOptions", "group": "Class" },
+    { "name": "ShowTreeView", "group": "Class" },
+    { "name": "ShowDisplayNames", "group": "Class" }
   ]
 }
