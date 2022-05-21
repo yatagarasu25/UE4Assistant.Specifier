@@ -1,14 +1,15 @@
-﻿using SystemEx;
+﻿using System.Linq;
+using SystemEx;
 
 namespace UE4Assistant
 {
 	public record struct Specifier(string type = null, Dictionary<string, object> data = null, int startIndex = 0, int endIndex = 0)
 	{
-		Lazy<TagModel> TagModel_ = new Lazy<TagModel>();
+		Lazy<TagModel> TagModel_ = null;
 		public TagModel tag {
 			get {
-				var type_ = type;
-				TagModel_ = TagModel_.Lazy(() => SpecifierSchema.ReadAvailableTags().Where(t => t.IsMatch(type_)).FirstOrDefault());
+				var type_ = type.ToLower();
+				TagModel_ = TagModel_.Lazy(() => SpecifierSchema.ReadAvailableTags().Where(t => t.name == type_).FirstOrDefault());
 				return TagModel_.Value;
 			}
 		}
@@ -31,14 +32,8 @@ namespace UE4Assistant
 				var si = line.IndexOfAnyReverse(li, ' ', '\t', ',', ';', '*', '&') + 1;
 
 				var tokenizer = line.tokenize(si);
-				var specifierData = new Dictionary<string, object>();// tokenizer.ParseSpecifier();
-				if (specifierData != null && specifierData.Keys.Count == 1)
+				if (TryParse(tokenizer, out var specifier))
 				{
-					var specifierType = specifierData.Keys.First();
-					Specifier specifier = new Specifier(
-						type: specifierType,
-						data: specifierData[specifierType] as Dictionary<string, object>);
-
 					yield return (si, tokenizer.ei, specifier);
 					li = tokenizer.li + 1;
 				}

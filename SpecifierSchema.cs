@@ -12,7 +12,7 @@ namespace UE4Assistant
 		{
 			try
 			{
-				var stream = typeof(SpecifierSchema).Assembly.GetManifestResourceStream(filename);
+				var stream = typeof(SpecifierSchema).Assembly.GetManifestResourceStream($"UE4Assistant.Schema.{filename}.json");
 				return new StreamReader(stream).ReadToEnd();
 			}
 			catch
@@ -60,15 +60,6 @@ namespace UE4Assistant
 	{
 		public string name;
 		public string type;
-
-		Lazy<Regex> nameRe;
-
-		public TagModel()
-		{
-			nameRe = new Lazy<Regex>(() => new Regex("^" + name.Replace("*", ".*?") + "$", RegexOptions.Compiled | RegexOptions.IgnoreCase));
-		}
-
-		public bool IsMatch(string str) => nameRe.Value.IsMatch(str);
 	}
 
 	public class SpecifierModel

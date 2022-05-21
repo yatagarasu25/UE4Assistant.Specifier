@@ -4,6 +4,7 @@
     { "name": "None", "category": "Blueprint", "group": "BlueprintNativeInterface", "type": "empty" },
     { "name": "None", "category": "Replication", "group": "RPCFunction", "type": "empty" },
     { "name": "None", "category": "Replication", "group": "Reliability", "type": "empty" },
+
     { "name": "BlueprintAuthorityOnly", "category": "Blueprint" },
     { "name": "BlueprintCallable", "group": "BlueprintFunction" },
     { "name": "BlueprintCosmetic", "category": "Blueprint" },

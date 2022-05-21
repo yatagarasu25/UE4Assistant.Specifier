@@ -2,6 +2,7 @@
   "parameters": [
     { "name": "None", "group": "BlueprintVisibility", "type": "empty" },
     { "name": "None", "group": "InspectorVisibility", "type": "empty" },
+ 
     { "name": "AdvancedDisplay", "category": "Inspector" },
     { "name": "AssetRegistrySearchable" },
     { "name": "BlueprintAssignable", "category": "Multicast Delegate" },
@@ -30,7 +31,7 @@
     { "name": "NonTransactional" },
     { "name": "NotReplicated", "category": "Replication" },
     { "name": "Replicated", "category": "Replication", "enable": [ "ReplicatedUsing" ] },
-    { "name": "ReplicatedUsing", "category": "Replication", "type": "String", "enable": [ "Replicated" ] },
+    { "name": "ReplicatedUsing", "category": "Replication", "type": "string", "enable": [ "Replicated" ] },
     { "name": "RepRetry", "category": "Replication" },
     { "name": "SaveGame" },
     { "name": "SerializeText" },
