@@ -1,15 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
 using SystemEx;
 
 
 
-namespace UE4Assistant.Specifier
+namespace UE4Assistant
 {
 	public class SpecifierSchema
 	{
@@ -17,9 +12,8 @@ namespace UE4Assistant.Specifier
 		{
 			try
 			{
-				var stream = Application.GetResourceStream(
-					new Uri(string.Format(@"/UE4Assistant.Specifier;component/Schema/{0}.json", filename), UriKind.Relative));
-				return new StreamReader(stream.Stream).ReadToEnd();
+				var stream = typeof(SpecifierSchema).Assembly.GetManifestResourceStream(filename);
+				return new StreamReader(stream).ReadToEnd();
 			}
 			catch
 			{
