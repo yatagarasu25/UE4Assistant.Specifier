@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using SystemEx;
 
 namespace UE4Assistant
@@ -13,12 +14,11 @@ namespace UE4Assistant
 				return TagModel_.Value;
 			}
 		}
-		/*
+		
 		public override string ToString()
 		{
-			return type + data.GenerateSpecifier(SpecifierSchema.ReadSpecifierSettings(type));
+			return type + GenerateSpecifier(data, SpecifierSchema.ReadSpecifierSettings(type));
 		}
-		*/
 
 		public static IEnumerable<(int si, int ei, Specifier s)> FindAll(string line)
 		{
@@ -177,6 +177,51 @@ namespace UE4Assistant
 
 			return result;
 		}
-	}
 
+		private static IEnumerable<string> GenerateSpecifierTokens(Dictionary<string, object> data, SpecifierSettings specifierSettings)
+		{
+			var keys = data.Keys.ToList();
+			keys.Sort((string a, string b) => {
+				int o = specifierSettings.GetParameterOrder(a).CompareTo(specifierSettings.GetParameterOrder(b));
+				return o == 0 ? a.CompareTo(b) : o;
+			});
+
+			foreach (var key in keys)
+			{
+				var value = data[key];
+
+				if (value != null)
+				{
+					if (value is string str)
+					{
+						yield return @$"{key} = ""{str}""";
+					}
+					else if (value is Dictionary<string, object> dict)
+					{
+						yield return @$"{key} = {GenerateSpecifier(dict, specifierSettings)}";
+					}
+					else
+					{
+						if (value is bool b)
+						{
+							yield return @$"{key} = {(b ? "true" : "false")}";
+						}
+						else
+						{
+							yield return @$"{key} = {Convert.ToString(value, CultureInfo.InvariantCulture)}";
+						}
+					}
+				}
+				else
+				{
+					yield return key;
+				}
+			}
+		}
+
+		public static string GenerateSpecifier(Dictionary<string, object> data, SpecifierSettings specifierSettings)
+		{
+			return $"({GenerateSpecifierTokens(data, specifierSettings).Join(", ")})";
+		}
+	}
 }
