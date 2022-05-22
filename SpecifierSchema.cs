@@ -60,6 +60,8 @@ namespace UE4Assistant
 	{
 		public string name;
 		public string type;
+
+		public override string ToString() => name.ToUpper();
 	}
 
 	public class SpecifierModel
@@ -74,6 +76,24 @@ namespace UE4Assistant
 		public string category;
 		public string group;
 		public string type;
+
+		public object DefaultValue
+			=> type switch {
+				"string" => (object)string.Empty,
+				"bool" => (object)false,
+				"integer" => (object)0,
+				_ => (object)false,
+			};
+
+		public Type Type
+			=> group.IsNullOrWhiteSpace()
+			? type switch {
+				"string" => typeof(string),
+				"bool" => typeof(bool),
+				"integer" => typeof(int),
+				_ => typeof(bool),
+			}
+			: typeof(string);
 	}
 
 	public class SpecifierSettings
