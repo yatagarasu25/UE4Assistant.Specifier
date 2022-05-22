@@ -61,7 +61,7 @@ namespace UE4Assistant.Tests
 			specifier.data.Should().NotBeNull().And.HaveCount(1)
 				.And.ContainKey("Category");
 
-			Assert.AreEqual("Test", specifier.data["Category"]);
+			specifier.data["Category"].Should().Be("Test");
 		}
 	}
 
@@ -86,9 +86,8 @@ namespace UE4Assistant.Tests
 				.And.ContainKey("meta");
 
 			var values = specifier.data["meta"] as Dictionary<string, object>;
-			Assert.AreNotEqual(null, values);
-			Assert.AreEqual(1, values.Count);
-			Assert.AreEqual(true, values.ContainsKey("ExposeOnSpawn"));
+			values.Should().NotBeNull().And.HaveCount(1)
+				.And.ContainKey("ExposeOnSpawn");
 		}
 	}
 }

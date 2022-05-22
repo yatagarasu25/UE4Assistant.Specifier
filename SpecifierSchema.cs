@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System.Text.RegularExpressions;
 using SystemEx;
 
+
+#if NET472_OR_GREATER
+namespace System.Runtime.CompilerServices { internal class IsExternalInit { } }
+#endif
 
 
 namespace UE4Assistant
@@ -40,42 +43,29 @@ namespace UE4Assistant
 
 		public static SpecifierModel ReadSpecifierModel(string name)
 		{
-			return JsonConvert.DeserializeObject<SpecifierModel>(ReadSchemaFile(name));
+			return new SpecifierModel(JsonConvert.DeserializeObject<Dictionary<string, List<SpecifierParameterModel>>>(ReadSchemaFile(name)));
 		}
 
 		public static SpecifierSettings ReadSpecifierSettings(string name)
 		{
-			return JsonConvert.DeserializeObject<SpecifierSettings>(ReadSchemaFile("{0}.settings".format(name.ToLower())))
-				?? new SpecifierSettings { order = new List<SpecifierOrder>() };
+			return JsonConvert.DeserializeObject<SpecifierSettings>(ReadSchemaFile("{0}.settings".format(name.ToLower())));
 		}
 	}
 
-	public class CategoryModel
+	public record struct CategoryModel(string name, int order);
+	public record struct TagModel(string name, string type)
 	{
-		public string name;
-		public int order;
-	}
-
-	public class TagModel
-	{
-		public string name;
-		public string type;
-
 		public override string ToString() => name.ToUpper();
 	}
 
-	public class SpecifierModel
+	public record struct SpecifierModel(Dictionary<string, List<SpecifierParameterModel>> collections);
+	public record struct SpecifierParameterModel(string name, string category, string group, string type)
 	{
-		public List<SpecifierParameterModel> parameters;
-		public List<SpecifierParameterModel> meta;
-	}
+		public bool IsEmpty => name.IsNullOrEmpty();
 
-	public class SpecifierParameterModel
-	{
-		public string name;
-		public string category;
-		public string group;
-		public string type;
+
+		public SpecifierParameterModel FixCategory(string defaultName)
+			=> new SpecifierParameterModel(name, category.IsNullOrWhiteSpace() ? "Common" : category, group, type);
 
 		public object DefaultValue
 			=> type switch {
@@ -96,35 +86,33 @@ namespace UE4Assistant
 			: typeof(string);
 	}
 
-	public class SpecifierSettings
+	public record struct SpecifierSettings(List<SpecifierOrder> order, SpecifierOrder defaultOrder = new())
 	{
-		public List<SpecifierOrder> order;
-
-		protected SpecifierOrder defaultOrder = null;
-
 		public int GetParameterOrder(string parameterName)
 		{
-			var oi = order.Where(i => i.name == parameterName).FirstOrDefault();
-			if (oi == null)
+			foreach (var oi in order.Where(i => i.name == parameterName))
 			{
-				if (defaultOrder == null)
-				{
-					defaultOrder = order.Where(i => i.name == "*").FirstOrDefault();
-					if (defaultOrder == null)
-					{
-						defaultOrder = new SpecifierOrder { name = "*", order = 0 };
-					}
-				}
-				oi = defaultOrder;
+				return oi.normalizedOrder;
 			}
-			int o = oi != null ? oi.order : 0;
-			return o < 0 ? int.MaxValue + o : o;
+
+			if (defaultOrder.IsEmpty)
+			{
+				foreach (var di in order.Where(i => i.name == "*"))
+				{ 
+					return di.normalizedOrder;
+				}
+
+				defaultOrder = new(name: "*", order: 0);
+			}
+
+			return defaultOrder.normalizedOrder;
 		}
 	}
 
-	public class SpecifierOrder
+	public record struct SpecifierOrder(string name = "", int order = 0)
 	{
-		public string name;
-		public int order = 0;
+		public bool IsEmpty => name.IsNullOrEmpty();
+
+		public int normalizedOrder => order < 0 ? int.MaxValue + order : order;
 	}
 }

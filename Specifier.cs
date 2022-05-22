@@ -1,24 +1,45 @@
 ﻿using System.Globalization;
-using System.Linq;
 using SystemEx;
 
 namespace UE4Assistant
 {
 	public record struct Specifier(string type = null, Dictionary<string, object> data = null, int startIndex = 0, int endIndex = 0)
 	{
-		Lazy<TagModel> TagModel_ = null;
+		Lazy<TagModel> tag_ = null;
 		public TagModel tag {
 			get {
-				var type_ = type.ToLower();
-				TagModel_ = TagModel_.Lazy(() => SpecifierSchema.ReadAvailableTags().Where(t => t.name == type_).FirstOrDefault());
-				return TagModel_.Value;
+				var ltype_ = type.ToLower();
+				tag_ = tag_.Lazy(() => SpecifierSchema.ReadAvailableTags().Where(t => t.name == ltype_).FirstOrDefault());
+				return tag_.Value;
 			}
 		}
-		
+
+		public Lazy<SpecifierModel> model_ = null;
+		public SpecifierModel model {
+			get {
+				var ltag_ = tag;
+				model_ = model_.Lazy(() => SpecifierSchema.ReadSpecifierModel(ltag_.name));
+				return model_.Value;
+			}
+		}
+
 		public override string ToString()
 		{
 			return type + GenerateSpecifier(data, SpecifierSchema.ReadSpecifierSettings(type));
 		}
+
+		public Dictionary<string, SpecifierParameterModel[]> ToModelDictionary(string name)
+		{
+			var groups = model.collections[name]
+				.GroupBy(p => p.group
+					, LambdaComparer.Create((string a, string b) 
+						=> (a.IsNullOrWhiteSpace() || b.IsNullOrWhiteSpace()) 
+						? -1 : string.Compare(a, b)
+					));
+			var items = groups.ToDictionary(g => g.Key.IsNullOrWhiteSpace() ? g.First().name : g.Key, g => g.ToArray());
+			return items;
+		}
+
 
 		public static IEnumerable<(int si, int ei, Specifier s)> FindAll(string line)
 		{
@@ -68,7 +89,7 @@ namespace UE4Assistant
 			return false;
 		}
 
-		public static Dictionary<string, object> ParseSpecifierData(LineTokenizer tokenizer)
+		static Dictionary<string, object> ParseSpecifierData(LineTokenizer tokenizer)
 		{
 			Dictionary<string, object> result = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -178,7 +199,7 @@ namespace UE4Assistant
 			return result;
 		}
 
-		private static IEnumerable<string> GenerateSpecifierTokens(Dictionary<string, object> data, SpecifierSettings specifierSettings)
+		static IEnumerable<string> GenerateSpecifierTokens(Dictionary<string, object> data, SpecifierSettings specifierSettings)
 		{
 			var keys = data.Keys.ToList();
 			keys.Sort((string a, string b) => {
@@ -219,7 +240,7 @@ namespace UE4Assistant
 			}
 		}
 
-		public static string GenerateSpecifier(Dictionary<string, object> data, SpecifierSettings specifierSettings)
+		static string GenerateSpecifier(Dictionary<string, object> data, SpecifierSettings specifierSettings)
 		{
 			return $"({GenerateSpecifierTokens(data, specifierSettings).Join(", ")})";
 		}
