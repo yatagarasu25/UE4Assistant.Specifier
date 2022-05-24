@@ -23,22 +23,22 @@ namespace UE4Assistant
 			}
 		}
 
+		public Dictionary<string, object> GetData(string name)
+		{
+			if (data.TryGetValue(name, out var root))
+				return (Dictionary<string, object>)root;
+
+			return data;
+		}
+
 		public override string ToString()
 		{
 			return type + GenerateSpecifier(data, SpecifierSchema.ReadSpecifierSettings(type));
 		}
 
-		public Dictionary<string, SpecifierParameterModel[]> ToModelDictionary(string name)
-		{
-			var groups = model.collections[name]
-				.GroupBy(p => p.group
-					, LambdaComparer.Create((string a, string b) 
-						=> (a.IsNullOrWhiteSpace() || b.IsNullOrWhiteSpace()) 
-						? -1 : string.Compare(a, b)
-					));
-			var items = groups.ToDictionary(g => g.Key.IsNullOrWhiteSpace() ? g.First().name : g.Key, g => g.ToArray());
-			return items;
-		}
+		// create groups of one value or list all flags to group
+		public IEnumerable<IGrouping<string, SpecifierParameterModel>> GroupProperties(string name)
+			=> model.collections[name].GroupBy(p => p.group.IsNullOrWhiteSpace() ? p.name : p.group);
 
 
 		public static IEnumerable<(int si, int ei, Specifier s)> FindAll(string line)
