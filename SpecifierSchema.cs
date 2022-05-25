@@ -48,7 +48,13 @@ namespace UE4Assistant
 
 		public static SpecifierSettings ReadSpecifierSettings(string name)
 		{
-			return JsonConvert.DeserializeObject<SpecifierSettings>(ReadSchemaFile("{0}.settings".format(name.ToLower())));
+			try
+			{
+				return JsonConvert.DeserializeObject<SpecifierSettings>(ReadSchemaFile("{0}.settings".format(name.ToLower())));
+			}
+			catch { }
+
+			return new SpecifierSettings(new());
 		}
 	}
 

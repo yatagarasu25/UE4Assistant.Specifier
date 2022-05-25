@@ -27,11 +27,17 @@ namespace UE4Assistant
 			}
 		}
 
+		public static Specifier Create(TagModel t)
+			=> new Specifier(t.name.ToUpper())
+				.Let(s =>
+					new Specifier(t.name.ToUpper(),
+						s.model.collections.Aggregate(NewData, (a, i) => a.Also(_ => _.Add(i.Key == "parameters" ? "" : i.Key, NewData)))));
+
 		public Dictionary<string, object> GetData(string name)
 			=> data.TryGetValue(name, out var root) ? (Dictionary<string, object>)root : null;
 
-		public override string ToString()
-			=> $"{type}({GenerateSpecifier(SpecifierSchema.ReadSpecifierSettings(type))})";
+		public Specifier Swap(string name, Dictionary<string, object> newData)
+			=> new Specifier(type, data.ToDictionary(i => i.Key, i => i.Key == name ? newData : i.Value));
 
 		// create groups of one value or list all flags to group
 		public IEnumerable<IGrouping<string, SpecifierParameterModel>> GroupProperties(string name)
@@ -61,6 +67,8 @@ namespace UE4Assistant
 			}
 		}
 
+
+		public override string ToString() => $"{type}({GenerateSpecifier(SpecifierSchema.ReadSpecifierSettings(type))})";
 		public static bool TryParse(string str, out Specifier s) => TryParse(str.tokenize(), out s);
 		public static bool TryParse(LineTokenizer tokenizer, out Specifier s)
 		{
@@ -86,9 +94,6 @@ namespace UE4Assistant
 
 			return false;
 		}
-
-		public Specifier Swap(string name, Dictionary<string, object> newData)
-			=> new Specifier(type, data.ToDictionary(i => i.Key, i => i.Key == name ? newData : i.Value));
 
 		static IEnumerable<(string name, Dictionary<string, object>)> ParseSpecifierData(LineTokenizer tokenizer)
 		{
@@ -242,6 +247,7 @@ namespace UE4Assistant
 		string GenerateSpecifier(SpecifierSettings specifierSettings)
 			=> this.Let(this_
 				=> this_.data.ToDictionary(i => i.Key, i => GenerateSpecifierTokens(this_.GetData(i.Key), specifierSettings).Join(", "))
+					.Where(i => !i.Value.IsNullOrWhiteSpace())
 					.OrderBy(i => i.Key)
 					.Select(i => i.Key.IsNullOrWhiteSpace() ? i.Value : $"{i.Key} = ({i.Value})")
 					.Join(", "));
