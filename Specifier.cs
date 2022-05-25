@@ -5,6 +5,10 @@ namespace UE4Assistant
 {
 	public record struct Specifier(string type = null, Dictionary<string, object> data = null, int startIndex = 0, int endIndex = 0)
 	{
+		private static Dictionary<string, object> NewData => new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+
+		public bool IsEmpty => type.IsNullOrWhiteSpace();
+
 		Lazy<TagModel> tag_ = null;
 		public TagModel tag {
 			get {
@@ -24,21 +28,14 @@ namespace UE4Assistant
 		}
 
 		public Dictionary<string, object> GetData(string name)
-		{
-			if (data.TryGetValue(name, out var root))
-				return (Dictionary<string, object>)root;
-
-			return data;
-		}
+			=> data.TryGetValue(name, out var root) ? (Dictionary<string, object>)root : null;
 
 		public override string ToString()
-		{
-			return type + GenerateSpecifier(data, SpecifierSchema.ReadSpecifierSettings(type));
-		}
+			=> $"{type}({GenerateSpecifier(SpecifierSchema.ReadSpecifierSettings(type))})";
 
 		// create groups of one value or list all flags to group
 		public IEnumerable<IGrouping<string, SpecifierParameterModel>> GroupProperties(string name)
-			=> model.collections[name].GroupBy(p => p.group.IsNullOrWhiteSpace() ? p.name : p.group);
+			=> model.collections[name == "" ? "parameters" : name].GroupBy(p => p.group.IsNullOrWhiteSpace() ? p.name : p.group);
 
 
 		public static IEnumerable<(int si, int ei, Specifier s)> FindAll(string line)
@@ -64,9 +61,10 @@ namespace UE4Assistant
 			}
 		}
 
+		public static bool TryParse(string str, out Specifier s) => TryParse(str.tokenize(), out s);
 		public static bool TryParse(LineTokenizer tokenizer, out Specifier s)
 		{
-			s = new ();
+			s = new();
 
 			bool ok = tokenizer.find_any(out char ch, "()=,\"");
 			if (!ok || ch != '(')
@@ -77,7 +75,7 @@ namespace UE4Assistant
 			try
 			{
 				string name = tokenizer.token.Trim();
-				s = new (name, ParseSpecifierData(tokenizer));
+				s = new(name, ParseSpecifierData(tokenizer).Aggregate(NewData, (s, i) => s.Also(_ => _.Add(i.name, i.Item2))));
 
 				return true;
 			}
@@ -89,9 +87,12 @@ namespace UE4Assistant
 			return false;
 		}
 
-		static Dictionary<string, object> ParseSpecifierData(LineTokenizer tokenizer)
+		public Specifier Swap(string name, Dictionary<string, object> newData)
+			=> new Specifier(type, data.ToDictionary(i => i.Key, i => i.Key == name ? newData : i.Value));
+
+		static IEnumerable<(string name, Dictionary<string, object>)> ParseSpecifierData(LineTokenizer tokenizer)
 		{
-			Dictionary<string, object> result = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+			Dictionary<string, object> result = NewData;
 
 			bool ok = tokenizer.find_any(out char ch, '(');
 			if (ok)
@@ -110,7 +111,7 @@ namespace UE4Assistant
 					if (!name.IsNullOrWhiteSpace())
 						try { result.Add(name, null); } catch { }
 
-					return result;
+					yield return ("", result);
 				}
 
 				if (name.IsNullOrWhiteSpace()) // name is empty
@@ -149,7 +150,8 @@ namespace UE4Assistant
 					}
 					else if (ch == '(') // name=(...
 					{
-						result.Add(name, ParseSpecifierData(tokenizer));
+						foreach (var d in ParseSpecifierData(tokenizer))
+							yield return (name + d.name, d.Item2);
 					}
 					else // name=value
 					{
@@ -180,7 +182,8 @@ namespace UE4Assistant
 				}
 				else if (ch == '(') // name(...
 				{
-					result.Add(name, ParseSpecifierData(tokenizer));
+					foreach (var d in ParseSpecifierData(tokenizer))
+						yield return (name + d.name, d.Item2);
 				}
 
 				ok &= tokenizer.skip_whitespace(out ch);
@@ -196,7 +199,7 @@ namespace UE4Assistant
 				}
 			}
 
-			return result;
+			yield return ("", result);
 		}
 
 		static IEnumerable<string> GenerateSpecifierTokens(Dictionary<string, object> data, SpecifierSettings specifierSettings)
@@ -217,10 +220,6 @@ namespace UE4Assistant
 					{
 						yield return @$"{key} = ""{str}""";
 					}
-					else if (value is Dictionary<string, object> dict)
-					{
-						yield return @$"{key} = {GenerateSpecifier(dict, specifierSettings)}";
-					}
 					else
 					{
 						if (value is bool b)
@@ -240,9 +239,11 @@ namespace UE4Assistant
 			}
 		}
 
-		static string GenerateSpecifier(Dictionary<string, object> data, SpecifierSettings specifierSettings)
-		{
-			return $"({GenerateSpecifierTokens(data, specifierSettings).Join(", ")})";
-		}
+		string GenerateSpecifier(SpecifierSettings specifierSettings)
+			=> this.Let(this_
+				=> this_.data.ToDictionary(i => i.Key, i => GenerateSpecifierTokens(this_.GetData(i.Key), specifierSettings).Join(", "))
+					.OrderBy(i => i.Key)
+					.Select(i => i.Key.IsNullOrWhiteSpace() ? i.Value : $"{i.Key} = ({i.Value})")
+					.Join(", "));
 	}
 }
