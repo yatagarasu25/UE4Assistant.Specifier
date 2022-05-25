@@ -16,7 +16,7 @@ namespace UE4Assistant.Tests
 		{
 			Specifier.TryParse(str.tokenize(), out var specifier).Should().BeTrue();
 			specifier.type.Should().Be("UPROPERTY");
-			specifier.data.Should().NotBeNull().And.HaveCount(0);
+			specifier.data.Should().NotBeNull().And.HaveCount(1).And.ContainKey("");
 		}
 	}
 
@@ -37,7 +37,9 @@ namespace UE4Assistant.Tests
 		{
 			Specifier.TryParse(str.tokenize(), out var specifier).Should().BeTrue();
 			specifier.type.Should().Be("UFUNCTION");
-			specifier.data.Should().NotBeNull().And.HaveCount(1).And.ContainKey("BlueprintReadWrite");
+			specifier.data.Should().NotBeNull().And.HaveCount(1).And.ContainKey("");
+
+			(specifier.data[""] as Dictionary<string, object>).Should().NotBeNull().And.HaveCount(1).And.ContainKey("BlueprintReadWrite");
 		}
 	}
 
@@ -59,9 +61,12 @@ namespace UE4Assistant.Tests
 			specifier.type.Should().Be("UFUNCTION");
 
 			specifier.data.Should().NotBeNull().And.HaveCount(1)
+				.And.ContainKey("");
+
+			(specifier.data[""] as Dictionary<string, object>).Should().NotBeNull().And.HaveCount(1)
 				.And.ContainKey("Category");
 
-			specifier.data["Category"].Should().Be("Test");
+			(specifier.data[""] as Dictionary<string, object>)["Category"].Should().Be("Test");
 		}
 	}
 
@@ -82,11 +87,10 @@ namespace UE4Assistant.Tests
 			Specifier.TryParse(str.tokenize(), out var specifier).Should().BeTrue();
 			specifier.type.Should().Be("UFUNCTION");
 
-			specifier.data.Should().NotBeNull().And.HaveCount(1)
+			specifier.data.Should().NotBeNull().And.HaveCount(2)
 				.And.ContainKey("meta");
 
-			var values = specifier.data["meta"] as Dictionary<string, object>;
-			values.Should().NotBeNull().And.HaveCount(1)
+			(specifier.data["meta"] as Dictionary<string, object>).Should().NotBeNull().And.HaveCount(1)
 				.And.ContainKey("ExposeOnSpawn");
 		}
 	}
