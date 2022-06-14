@@ -44,12 +44,16 @@ namespace UE4Assistant
 			=> model.collections[name == "" ? "parameters" : name].GroupBy(p => p.group.IsNullOrWhiteSpace() ? p.name : p.group);
 
 
-		public static IEnumerable<(int si, int ei, Specifier s)> FindAll(string line)
+		public static IEnumerable<(int si, int ei, Specifier s)> FindAll(string line, int caret_index = 0)
 		{
-			int li = 0;
+			int li = caret_index;
 			while (true)
 			{
-				li = line.IndexOf('(', li);
+				li = line.IndexOfAny(li, '(', ')');
+				if (li < 0)
+					break;
+				if (line[li] == ')')
+					li = line.IndexOfAnyReverse(li, '(');
 				if (li < 0)
 					break;
 
@@ -82,8 +86,10 @@ namespace UE4Assistant
 
 			try
 			{
+				var li = tokenizer.li;
 				string name = tokenizer.token.Trim();
 				s = new(name, ParseSpecifierData(tokenizer).Aggregate(NewData, (s, i) => s.Also(_ => _.Add(i.name, i.Item2))));
+				var ei = tokenizer.ei;
 
 				return true;
 			}
@@ -97,6 +103,8 @@ namespace UE4Assistant
 
 		static IEnumerable<(string name, Dictionary<string, object>)> ParseSpecifierData(LineTokenizer tokenizer)
 		{
+			const string tokenTerminators = "=,()\"";
+
 			Dictionary<string, object> result = NewData;
 
 			bool ok = tokenizer.find_any(out char ch, '(');
@@ -108,7 +116,7 @@ namespace UE4Assistant
 				string name = null;
 
 				ok &= tokenizer.skip_whitespace();
-				ok &= tokenizer.find_any(out ch, '=', ',', '(', ')', '"');
+				ok &= tokenizer.find_any(out ch, tokenTerminators);
 				name = tokenizer.token.Trim();
 
 				if (!ok) // name
@@ -119,76 +127,81 @@ namespace UE4Assistant
 					yield return ("", result);
 				}
 
+				object true_ = (object)true;
+				object false_ = (object)false;
+
 				if (name.IsNullOrWhiteSpace()) // name is empty
 				{
 					ok &= tokenizer.step();
 				}
-				else if (ch == ')') // name)
+				else
 				{
-					result.Add(name, null);
-				}
-				else if (ch == ',') // name,
-				{
-					result.Add(name, null);
-					tokenizer.step();
-				}
-				else if (ch == '=') // name=...
-				{
-					tokenizer.step();
-					if (!tokenizer.skip_whitespace(out ch) || ch == ')') // name= or name=)
-					{
-						result.Add(name, string.Empty);
-						break;
-					}
-					else if (ch == '"') // name="....
-					{
-						tokenizer.step();
-						if (!tokenizer.find_any(out ch, '"')) // name="value
-						{
-							result.Add(name, tokenizer.token);
-							break;
-						}
+					var r = ch switch {
+						')' => true_.Also(_ => result.Add(name, null)),
+						',' => true_.Also(_ => {
+							result.Add(name, null);
+							tokenizer.step();
+						}),
+						'=' => true_.Let(_ => {
+							tokenizer.step();
+							if (!tokenizer.skip_whitespace(out ch) || ch == ')') // name= or name=)
+							{
+								result.Add(name, string.Empty);
+								return false_;
+							}
+							else return ch switch {
+								'"' => true_.Let(_ => {
+									tokenizer.step();
+									if (!tokenizer.find_any(out ch, '"')) // name="value
+									{
+										result.Add(name, tokenizer.token);
+										return false_;
+									}
 
-						// name="value"
-						result.Add(name, tokenizer.token);
-						tokenizer.step();
-					}
-					else if (ch == '(') // name=(...
+									// name="value"
+									result.Add(name, tokenizer.token);
+									tokenizer.step();
+
+									return _;
+								}),
+								'(' => ParseSpecifierData(tokenizer),
+								_ => true_.Let(_ => {
+									if (!tokenizer.find_any(out ch, tokenTerminators))
+									{
+										result.Add(name, tokenizer.token.Trim());
+										return false_;
+									}
+
+									result.Add(name, tokenizer.token.Trim()
+										.ToAnyType(typeof(bool), typeof(int), typeof(float)));
+									if (ch != ')')
+										tokenizer.step();
+
+									return _;
+								})
+							};
+						}),
+						'"' => true_.Let(_ => {
+							tokenizer.step();
+							if (!tokenizer.find_any('"')) // name"value
+							{
+								result.Add(name, tokenizer.token);
+								return false_;
+							}
+
+							// name"value"
+							result.Add(name, tokenizer.token);
+							tokenizer.step();
+
+							return _;
+						}),
+						'(' => ParseSpecifierData(tokenizer)
+					};
+					if (r is IEnumerable<(string name, Dictionary<string, object>)> de)
 					{
-						foreach (var d in ParseSpecifierData(tokenizer))
+						foreach (var d in de)
 							yield return (name + d.name, d.Item2);
 					}
-					else // name=value
-					{
-						if (!tokenizer.find_any(out ch, '=', ',', '(', ')', '"'))
-						{
-							result.Add(name, tokenizer.token.Trim());
-							break;
-						}
-
-						result.Add(name, tokenizer.token.Trim()
-							.ToAnyType(typeof(bool), typeof(int), typeof(float)));
-						if (ch != ')')
-							tokenizer.step();
-					}
-				}
-				else if (ch == '"') // name"...
-				{
-					tokenizer.step();
-					if (!tokenizer.find_any('"')) // name"value
-					{
-						result.Add(name, tokenizer.token);
-						break;
-					}
-
-					// name"value"
-					result.Add(name, tokenizer.token);
-					tokenizer.step();
-				}
-				else if (ch == '(') // name(...
-				{
-					foreach (var d in ParseSpecifierData(tokenizer))
-						yield return (name + d.name, d.Item2);
 				}
 
 				ok &= tokenizer.skip_whitespace(out ch);
