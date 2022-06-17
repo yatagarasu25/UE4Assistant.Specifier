@@ -11,6 +11,12 @@ namespace UE4Assistant
 {
 	public class SpecifierSchema
 	{
+		public static string ConfigurationFolderPath
+			=> Path.Combine(
+				Environment.GetFolderPath(
+					Environment.SpecialFolder.LocalApplicationData)
+				, "UE4Assistant");
+
 		private static string ReadSchemaFile(string filename)
 		{
 			try
@@ -56,6 +62,32 @@ namespace UE4Assistant
 
 			return new SpecifierSettings(new());
 		}
+
+		static readonly string BenuiSpecifierUrl = "https://github.com/yatagarasu25/UE-Specifier-Docs.git";
+		public static bool HaveBenuiSpecifiers
+			=> Directory.Exists(Path.Combine(ConfigurationFolderPath, "benuispecs"));
+
+		public static void UpdateBenuiSpecifiers()
+		{
+			if (!Directory.Exists(ConfigurationFolderPath))
+				Directory.CreateDirectory(ConfigurationFolderPath);
+
+			using (DirectoryEx.SetCurrentDirectory(ConfigurationFolderPath))
+			{
+				var BenuispecsFolderPath = Path.Combine(ConfigurationFolderPath, "benuispecs");
+				if (HaveBenuiSpecifiers)
+				{
+					using (DirectoryEx.SetCurrentDirectory(BenuispecsFolderPath))
+					{
+						ProcessEx.Command("git pull");
+					}
+				}
+				else
+				{
+					ProcessEx.Command($"git clone {BenuiSpecifierUrl} benuispecs");
+				}
+			}
+		}
 	}
 
 	public record struct CategoryModel(string name, int order);
@@ -75,10 +107,10 @@ namespace UE4Assistant
 
 		public object DefaultValue
 			=> type switch {
-				"string" => (object)string.Empty,
-				"bool" => (object)false,
-				"integer" => (object)0,
-				_ => (object)false,
+				"string" => string.Empty,
+				"bool" => false,
+				"integer" => 0,
+				_ => false,
 			};
 
 		public Type Type
@@ -104,7 +136,7 @@ namespace UE4Assistant
 			if (defaultOrder.IsEmpty)
 			{
 				foreach (var di in order.Where(i => i.name == "*"))
-				{ 
+				{
 					return di.normalizedOrder;
 				}
 

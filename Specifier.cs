@@ -3,7 +3,7 @@ using SystemEx;
 
 namespace UE4Assistant
 {
-	public record struct Specifier(string type = null, Dictionary<string, object> data = null, int startIndex = 0, int endIndex = 0)
+	public record struct Specifier(string type = null, Dictionary<string, object> data = null)
 	{
 		private static Dictionary<string, object> NewData => new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
 
