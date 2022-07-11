@@ -35,8 +35,8 @@
     { "name": "Within" }
   ],
   "meta": [
-    { "name" : "BlueprintSpawnableComponent", "type": "bool" },
-    { "name" : "BlueprintThreadSafe", "type": "bool" },
+    { "name" : "BlueprintSpawnableComponent" },
+    { "name" : "BlueprintThreadSafe"},
     { "name" : "ChildCannotTick", "type": "bool" },
     { "name" : "ChildCanTick", "type": "bool" },
     { "name" : "DeprecatedNode", "type": "bool" },
