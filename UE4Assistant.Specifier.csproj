@@ -1,45 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net60;net70</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
+	<PropertyGroup>
+		<TargetFrameworks>net60;net70</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
 
-    <LangVersion>latest</LangVersion>
+		<LangVersion>latest</LangVersion>
 
-    <RootNamespace>UE4Assistant</RootNamespace>
-  </PropertyGroup>
+		<RootNamespace>UE4Assistant</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Properties\**" />
-    <Compile Remove="Tests\**" />
-    <EmbeddedResource Remove="Properties\**" />
-    <EmbeddedResource Remove="Tests\**" />
-    <None Remove="Properties\**" />
-    <None Remove="Tests\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Properties\**" />
+		<Compile Remove="Tests\**" />
+		<EmbeddedResource Remove="Properties\**" />
+		<EmbeddedResource Remove="Tests\**" />
+		<None Remove="Properties\**" />
+		<None Remove="Tests\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Schema\categories.json" />
-    <EmbeddedResource Include="Schema\tags.json" />
-    <EmbeddedResource Include="Schema\uclass.json" />
-    <EmbeddedResource Include="Schema\uenum.json" />
-    <EmbeddedResource Include="Schema\ufunction.json" />
-    <EmbeddedResource Include="Schema\ufunction.settings.json" />
-    <EmbeddedResource Include="Schema\uinterface.json" />
-    <EmbeddedResource Include="Schema\umeta.json" />
-    <EmbeddedResource Include="Schema\uparam.json" />
-    <EmbeddedResource Include="Schema\uproperty.json" />
-    <EmbeddedResource Include="Schema\uproperty.settings.json" />
-    <EmbeddedResource Include="Schema\ustruct.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Schema\categories.json" />
+		<EmbeddedResource Include="Schema\tags.json" />
+		<EmbeddedResource Include="Schema\uclass.json" />
+		<EmbeddedResource Include="Schema\uenum.json" />
+		<EmbeddedResource Include="Schema\ufunction.json" />
+		<EmbeddedResource Include="Schema\ufunction.settings.json" />
+		<EmbeddedResource Include="Schema\uinterface.json" />
+		<EmbeddedResource Include="Schema\umeta.json" />
+		<EmbeddedResource Include="Schema\uparam.json" />
+		<EmbeddedResource Include="Schema\uproperty.json" />
+		<EmbeddedResource Include="Schema\uproperty.settings.json" />
+		<EmbeddedResource Include="Schema\ustruct.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SharpYaml" Version="2.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="SharpYaml" Version="2.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SystemEx\SystemEx.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SystemEx\SystemEx.csproj" />
+	</ItemGroup>
 
 </Project>
